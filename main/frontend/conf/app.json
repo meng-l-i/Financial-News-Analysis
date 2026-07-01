@@ -1,0 +1,10 @@
+{
+  "name": "CC Platform Frontend",
+  "port": 3001,
+  "api": {
+    "base": "/api",
+    "backend": "http://localhost:5070",
+    "token": "从 gen_token.py 获取"
+  },
+  "description": "金融热点监控 · 近5天 · 领域-公司-热点"
+}

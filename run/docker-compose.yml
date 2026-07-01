@@ -1,0 +1,150 @@
+services:
+  # ============================================
+  # MySQL
+  # ============================================
+  mysql:
+    image: mysql:8.0
+    container_name: cc-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: news
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ../data/mysql:/var/lib/mysql
+      - ../main/backend/conf/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
+      start_period: 30s
+
+  # ============================================
+  # Backend — Spring Boot (5070 + 5071 mgmt)
+  # ============================================
+  backend:
+    build:
+      context: ../main/backend
+      dockerfile: Dockerfile
+    container_name: cc-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/news?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================
+  # Frontend — Vue (nginx)
+  # ============================================
+  frontend:
+    build:
+      context: ../main/frontend
+      dockerfile: Dockerfile
+    container_name: cc-frontend
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ============================================
+  # Crawler — FastAPI + Scrapy
+  # ============================================
+  crawler:
+    build:
+      context: ../main/crawler
+      dockerfile: Dockerfile
+    container_name: cc-crawler
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: news
+    volumes:
+      - ../main/crawler/output:/app/output
+      - ../main/crawler/logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ============================================
+  # Prometheus
+  # ============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cc-prometheus
+    volumes:
+      - ../main/check/conf/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../main/check/prometheus/alert.rules.yml:/etc/prometheus/alert.rules.yml:ro
+      - ../data/prometheus:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    restart: unless-stopped
+
+  # ============================================
+  # Grafana
+  # ============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cc-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ../main/check/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../data/grafana:/var/lib/grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  # ============================================
+  # node_exporter × 3
+  # ============================================
+  node-backend:
+    image: prom/node-exporter:latest
+    container_name: cc-node-backend
+    command: ["--path.rootfs=/host"]
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  node-frontend:
+    image: prom/node-exporter:latest
+    container_name: cc-node-frontend
+    command: ["--path.rootfs=/host"]
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  node-data:
+    image: prom/node-exporter:latest
+    container_name: cc-node-data
+    command: ["--path.rootfs=/host"]
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    restart: unless-stopped
+
+  # ============================================
+  # MySQL Exporter
+  # ============================================
+  mysqld-exporter:
+    image: prom/mysqld-exporter:v0.15.0
+    container_name: cc-mysqld-exporter
+    volumes:
+      - ../main/check/conf/my.cnf:/.my.cnf
+    restart: unless-stopped
+    depends_on:
+      - mysql

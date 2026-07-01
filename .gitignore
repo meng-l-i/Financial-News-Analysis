@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 爬虫数据
+main/crawler/output/
+main/crawler/logs/
+main/crawler/data/
+
+# 持久化数据
+data/
+
+# 前端
+main/frontend/node_modules/
+main/frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Maven
+main/backend/target/
+
+# Docker 运行时
+.env
+
+# 文档
+init.md
+record.md
+README_local.md
+agent问题.md

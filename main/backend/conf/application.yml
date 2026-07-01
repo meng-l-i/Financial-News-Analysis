@@ -1,0 +1,44 @@
+server:
+  port: 5070
+
+spring:
+  application:
+    name: cc-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/news?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    open-in-view: false
+
+# Token secret (30-min window, HMAC-SHA256)
+app:
+  token-secret: cc-platform-default-secret
+
+# Actuator + Prometheus metrics (management port 5071, no auth)
+management:
+  server:
+    port: 5071
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+      base-path: /
+      path-mapping:
+        prometheus: metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    root: INFO
+    com.cc: DEBUG

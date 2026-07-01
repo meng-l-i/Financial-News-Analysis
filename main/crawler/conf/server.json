@@ -1,0 +1,13 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5080,
+    "description": "CC Crawler FastAPI server"
+  },
+  "schedule": {
+    "first_rerun_minutes": 30,
+    "regular_interval_minutes": 60,
+    "description": "Startup → immediate crawl, 2nd after 30min, then every 60min"
+  },
+  "spiders": ["cls", "stcn", "cs", "csrc"]
+}

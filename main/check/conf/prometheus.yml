@@ -1,0 +1,61 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: cc-platform
+
+rule_files:
+  - /etc/prometheus/alert.rules.yml
+
+# Targets: Docker Compose service names (容器内 DNS 可解析)
+# K8s 部署时替换为 <service-name>.<namespace>.svc.cluster.local
+scrape_configs:
+  - job_name: cc-backend
+    metrics_path: /metrics
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - "backend:5071"
+        labels:
+          service: backend
+          framework: spring-boot
+
+  - job_name: cc-mysql
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "mysqld-exporter:9104"
+        labels:
+          service: mysql
+
+  - job_name: node-backend
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "node-backend:9100"
+        labels:
+          server: backend
+
+  - job_name: node-frontend
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "node-frontend:9100"
+        labels:
+          server: frontend
+
+  - job_name: node-data
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "node-data:9100"
+        labels:
+          server: data-service
+
+  - job_name: prometheus
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - "localhost:9090"
+        labels:
+          service: prometheus

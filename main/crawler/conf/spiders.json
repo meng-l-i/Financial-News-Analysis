@@ -1,0 +1,32 @@
+{
+  "spiders": {
+    "cls": {
+      "name": "财联社",
+      "enabled": true,
+      "description": "财联社电报新闻，近5天",
+      "url": "https://www.cls.cn/telegraph"
+    },
+    "stcn": {
+      "name": "证券时报",
+      "enabled": false,
+      "description": "证券时报新闻列表",
+      "url": "https://www.stcn.com/article/list/kx.html"
+    },
+    "cs": {
+      "name": "中国证券报",
+      "enabled": false,
+      "description": "中证报要闻/上市公司/财经",
+      "url": "https://www.cs.com.cn/ssgs/01/list.html"
+    },
+    "csrc": {
+      "name": "证监会",
+      "enabled": false,
+      "description": "证监会统计信息-市场快报，分离页面内多个标题(需要解析docx，暂时没写好)",
+      "url": "https://www.csrc.gov.cn/csrc/c100119/c7634630/content.shtml"
+    }
+  },
+  "output": {
+    "dir": "output",
+    "format": "json"
+  }
+}

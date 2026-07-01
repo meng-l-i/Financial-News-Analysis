@@ -1,0 +1,59 @@
+groups:
+  - name: cc-platform
+    interval: 30s
+    rules:
+      # --- 应用层 ---
+      - alert: ServiceDown
+        expr: up{job=~"cc-backend|cc-frontend|cc-data-service|cc-mysql"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.service }} is down"
+          description: "Service {{ $labels.service }} ({{ $labels.instance }}) has been down for more than 1 minute."
+
+      - alert: HighJvmMemoryUsage
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.9
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High JVM heap usage on {{ $labels.instance }}"
+          description: "JVM heap usage is above 90% for 2 minutes."
+
+      # --- 主机层 (node_exporter × 3) ---
+      - alert: HostDown
+        expr: up{job=~"node-backend|node-frontend|node-data"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.server }} host is unreachable"
+          description: "Node exporter on {{ $labels.server }} ({{ $labels.instance }}) has been down for more than 1 minute."
+
+      - alert: HighHostCpu
+        expr: 100 - (avg by (server) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU on {{ $labels.server }}"
+          description: "Host CPU usage on {{ $labels.server }} is above 90% for 5 minutes."
+
+      - alert: HighHostMemory
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.server }}"
+          description: "Host memory usage on {{ $labels.server }} ({{ $labels.instance }}) is above 90% for 5 minutes."
+
+      - alert: HighHostDisk
+        expr: (1 - (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"})) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk usage on {{ $labels.server }}"
+          description: "Disk usage on {{ $labels.server }} ({{ $labels.instance }}) is above 85%."

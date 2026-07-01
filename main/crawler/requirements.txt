@@ -1,0 +1,11 @@
+scrapy==2.11.0
+scrapy-playwright==0.0.40
+playwright==1.48.0
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+apscheduler>=3.10.0
+langchain>=0.2.0
+langchain-openai>=0.1.0
+pymysql>=1.1.0
+duckduckgo-search>=6.0.0
+httpx[socks]
