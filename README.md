@@ -10,7 +10,7 @@ Automated collection of financial news sources (e.g. cls.cn), extraction of sect
 - **Vue 3 Frontend**: Sector dropdown lists + company heat display, login auth, 5-day news filter
 - **FastAPI Scheduling Service**: Startup → 30min → 1h crawling schedule, auto-triggers Agent analysis after each crawl
 - **Prometheus + Grafana Monitoring**: Full coverage of backend JVM, host CPU/Memory/Disk, MySQL status
-- **Docker Compose One-Click Deploy**: 6 services orchestrated, Kubernetes configs provided
+- **Docker Compose One-Click Deploy**: 6 services orchestrated, Docker compose configs provided
 
 ## Architecture
 
