@@ -10,7 +10,7 @@
 - **Vue 3 前端**：领域下拉列表 + 公司热点展示，登录鉴权，近 5 天筛选
 - **FastAPI 调度服务**：启动→30min→1h 定时爬虫调度，爬取后自动触发 Agent 分析
 - **Prometheus + Grafana 监控**：后端 JVM / 主机 CPU 内存磁盘 / MySQL 状态全覆盖
-- **Docker Compose 一键部署**：11 个服务编排，Kubernetes 配置同步提供
+- **Docker Compose 一键部署**：6 个服务编排，Kubernetes 配置同步提供
 
 ## 项目架构
 
